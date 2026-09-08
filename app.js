@@ -1,6 +1,6 @@
 const SHADOW_CONFIG = {
     github: {
-        owner: "ShadowOS-Linux",
+        owner: "ShadowElixir",
         repo: "shadowos-linux",
         workflowFile: "build-iso.yml"
     }
