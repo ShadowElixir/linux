@@ -110,7 +110,7 @@ h2 {
     line-height: 1.4;
 }
 
-/* Progressive Reveal Transitions */
+/* Reveal Transitions */
 .conditional-step {
     opacity: 0;
     visibility: hidden;
