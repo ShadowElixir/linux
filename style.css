@@ -2,7 +2,7 @@
     --bg-color: #0d1117;
     --card-bg: #161b22;
     --accent: #58a6ff;
-    --feature-accent: #388bfd; /* Distinct, punchier blue for the informational feature cards */
+    --feature-accent: #388bfd;
     --text: #c9d1d9;
     --text-muted: #8b949e;
     --border-color: #30363d;
@@ -57,7 +57,7 @@ h2 {
     background-color: var(--card-bg);
     border: 1px solid var(--border-color);
     border-radius: 6px;
-    padding: 1rem; /* Marginally adjusted to let image layouts breathe */
+    padding: 1rem;
     color: var(--text);
     cursor: pointer;
     text-align: left;
@@ -227,7 +227,7 @@ h2 {
 }
 
 .feature-card {
-    background-color: #121820; /* Slightly darker shift for visual contrast */
+    background-color: #121820;
     border: 1px solid var(--feature-accent);
     box-shadow: 0 0 0 1px var(--feature-accent);
     border-radius: 6px;
