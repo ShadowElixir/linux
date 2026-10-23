@@ -7,6 +7,7 @@ const SHADOW_CONFIG = {
 };
 
 const runtimeState = {
+    base: null,
     de: null,
     gpu: null,
     steam: null,
@@ -35,6 +36,10 @@ function initializeUIEventListeners() {
             });
 
             currentButton.classList.add("active");
+
+            if (matrixStep === "base") {
+                runtimeState.base = elementValue;
+            }
 
             if (matrixStep === "de") {
                 runtimeState.de = elementValue;
@@ -144,106 +149,97 @@ async function fetchLatestArtifacts() {
     }
 }
 
+function setVisible(el, show) {
+    if (el) {
+        el.classList.toggle("visible", show);
+    }
+}
+
 function evaluateShadowPipeline() {
+    const { base, de, gpu, steam, channel } = runtimeState;
+    const isBazzite = base === "bazzite";
+    const isFedora = base === "fedora";
+
+    const stepDe = document.getElementById("step-de");
     const stepGpu = document.getElementById("step-gpu");
     const stepSteam = document.getElementById("step-steam");
     const stepChannel = document.getElementById("step-channel");
     const finalDownload = document.getElementById("final-download");
-    const downloadBtn = document.querySelector(
-        ".dynamic-download-trigger"
+    const downloadBtn = document.querySelector(".dynamic-download-trigger");
+
+    setVisible(stepDe, isBazzite);
+    setVisible(stepGpu, (isBazzite && de !== null) || isFedora);
+    setVisible(stepSteam, isBazzite && de !== null && gpu !== null);
+    setVisible(
+        stepChannel,
+        isBazzite && de !== null && gpu !== null && steam !== null
     );
 
-    if (runtimeState.de !== null && stepGpu) {
-        stepGpu.classList.add("visible");
+    // Renumber the steps that apply to the chosen base
+    const order = isFedora
+        ? ["step-base", "step-gpu"]
+        : ["step-base", "step-de", "step-gpu", "step-steam", "step-channel"];
+
+    order.forEach((id, index) => {
+        const num = document.querySelector(`#${id} .step-num`);
+        if (num) {
+            num.textContent = index + 1;
+        }
+    });
+
+    let variantTarget = null;
+
+    if (isBazzite && de !== null && gpu !== null && steam !== null && channel !== null) {
+        variantTarget = `shadowos-${de}${gpu}${steam}${channel}`;
+    } else if (isFedora && gpu !== null) {
+        variantTarget = `shadowos-lite${gpu}`;
     }
 
-    if (
-        runtimeState.de !== null &&
-        runtimeState.gpu !== null &&
-        stepSteam
-    ) {
-        stepSteam.classList.add("visible");
+    if (!variantTarget) {
+        setVisible(finalDownload, false);
+        return;
     }
 
+    const { owner, repo } = SHADOW_CONFIG.github;
+    console.log("Looking for artifact:", variantTarget);
+
     if (
-        runtimeState.de !== null &&
-        runtimeState.gpu !== null &&
-        runtimeState.steam !== null &&
-        stepChannel
+        !runtimeState.liveData.suiteId ||
+        Object.keys(runtimeState.liveData.artifacts).length === 0
     ) {
-        stepChannel.classList.add("visible");
+        if (downloadBtn) {
+            downloadBtn.removeAttribute("href");
+            downloadBtn.style.pointerEvents = "none";
+            downloadBtn.style.opacity = "0.4";
+        }
+
+        setVisible(finalDownload, true);
+        return;
     }
 
-    if (
-        runtimeState.de !== null &&
-        runtimeState.gpu !== null &&
-        runtimeState.steam !== null &&
-        runtimeState.channel !== null
-    ) {
-        const { owner, repo } = SHADOW_CONFIG.github;
+    const matchedArtifact = runtimeState.liveData.artifacts[variantTarget];
 
-        const variantTarget =
-            `shadowos-${runtimeState.de}` +
-            `${runtimeState.gpu}` +
-            `${runtimeState.steam}` +
-            `${runtimeState.channel}`;
+    if (matchedArtifact) {
+        if (downloadBtn) {
+            downloadBtn.href =
+                `https://nightly.link/${owner}/${repo}` +
+                `/suites/${runtimeState.liveData.suiteId}` +
+                `/artifacts/${matchedArtifact.id}`;
 
-        console.log("Looking for artifact:", variantTarget);
-
-        if (
-            !runtimeState.liveData.suiteId ||
-            Object.keys(runtimeState.liveData.artifacts).length === 0
-        ) {
-            if (downloadBtn) {
-                downloadBtn.removeAttribute("href");
-                downloadBtn.style.pointerEvents = "none";
-                downloadBtn.style.opacity = "0.4";
-            }
-
-            if (finalDownload) {
-                finalDownload.classList.add("visible");
-            }
-
-            return;
+            downloadBtn.style.pointerEvents = "auto";
+            downloadBtn.style.opacity = "1";
         }
 
-        const matchedArtifact =
-            runtimeState.liveData.artifacts[variantTarget];
-
-        if (matchedArtifact) {
-            if (downloadBtn) {
-                downloadBtn.href =
-                    `https://nightly.link/${owner}/${repo}` +
-                    `/suites/${runtimeState.liveData.suiteId}` +
-                    `/artifacts/${matchedArtifact.id}`;
-
-                downloadBtn.style.pointerEvents = "auto";
-                downloadBtn.style.opacity = "1";
-            }
-
-            console.log(
-                "Matched artifact:",
-                matchedArtifact.name
-            );
-        } else {
-            if (downloadBtn) {
-                downloadBtn.removeAttribute("href");
-                downloadBtn.style.pointerEvents = "none";
-                downloadBtn.style.opacity = "0.15";
-            }
-
-            console.warn(
-                `No artifact found for variant: ${variantTarget}`
-            );
-        }
-
-        if (finalDownload) {
-            finalDownload.classList.add("visible");
-        }
-
+        console.log("Matched artifact:", matchedArtifact.name);
     } else {
-        if (finalDownload) {
-            finalDownload.classList.remove("visible");
+        if (downloadBtn) {
+            downloadBtn.removeAttribute("href");
+            downloadBtn.style.pointerEvents = "none";
+            downloadBtn.style.opacity = "0.15";
         }
+
+        console.warn(`No artifact found for variant: ${variantTarget}`);
     }
+
+    setVisible(finalDownload, true);
 }

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ShadowOS</title>
     
-    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/ShadowElixir/shadowos-linux/refs/heads/main/files/system/usr/share/pixmaps/fedora-logo-sprite.png">
+    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/ShadowElixir/shadowos-linux/refs/heads/main/files/base/usr/share/pixmaps/fedora-logo-sprite.png">
     
     <link rel="stylesheet" href="style.css">
 </head>
@@ -15,7 +15,7 @@
 
     <header class="brand-header">
         <img src="https://github.com/ShadowElixir/shadowos-linux/raw/refs/heads/main/files/system/usr/share/pixmaps/fedora_whitelogo.svg" alt="ShadowOS Logo" class="brand-logo hero-logo">
-        <p class="brand-subtitle">Custom Bazzite image with Cosmic/Gnome/KDE/XFCE.</p>
+        <p class="brand-subtitle">Custom Bazzite image with Cosmic/Gnome/KDE/XFCE, plus a lightweight Fedora edition.</p>
     </header>
 
     <div class="main-layout">
@@ -77,8 +77,24 @@
         <div class="right-column">
             <div class="section-divider-tag">DOWNLOAD</div>
             
-            <div class="step-section">
-                <h2>1. Desktop Environment</h2>
+            <div id="step-base" class="step-section">
+                <h2><span class="step-num">1</span>. Base</h2>
+                <p class="subtitle">Choose the foundation for your system.</p>
+
+                <div class="selector-grid base-grid" data-step="base">
+                    <button class="option-btn" data-value="bazzite">
+                        <h3>Bazzite-based <span class="badge">Recommended</span></h3>
+                        <p>Full-featured gaming-ready system with your choice of desktop.</p>
+                    </button>
+                    <button class="option-btn" data-value="fedora">
+                        <h3>Fedora-based</h3>
+                        <p>Lightweight version, for old laptops.</p>
+                    </button>
+                </div>
+            </div>
+
+            <div id="step-de" class="step-section conditional-step">
+                <h2><span class="step-num">2</span>. Desktop Environment</h2>
                 <p class="subtitle">Choose your preferred desktop layout.</p>
                 
                 <div class="selector-grid" data-step="de">
@@ -106,7 +122,7 @@
             </div>
 
             <div id="step-gpu" class="step-section conditional-step">
-                <h2>2. Graphics Drivers</h2>
+                <h2><span class="step-num">3</span>. Graphics Drivers</h2>
                 <p class="subtitle">Select the drivers your graphics hardware requires.</p>
                 
                 <div class="selector-grid" data-step="gpu">
@@ -126,7 +142,7 @@
             </div>
 
             <div id="step-steam" class="step-section conditional-step">
-                <h2>3. Steam</h2>
+                <h2><span class="step-num">4</span>. Steam</h2>
                 <p class="subtitle">Choose whether you want Steam bundled with the system setup.</p>
                 
                 <div class="selector-grid" data-step="steam">
@@ -142,7 +158,7 @@
             </div>
 
             <div id="step-channel" class="step-section conditional-step">
-                <h2>4. Release Channel</h2>
+                <h2><span class="step-num">5</span>. Release Channel</h2>
                 <p class="subtitle">Select your preferred stability release channel.</p>
                 
                 <div class="selector-grid" data-step="channel">

@@ -277,3 +277,25 @@ footer a:hover {
     color: var(--accent);
     text-decoration: underline;
 }
+
+/* Base selector badge */
+.base-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.badge {
+    display: inline-block;
+    margin-left: 0.35rem;
+    padding: 1px 7px;
+    border: 1px solid var(--accent);
+    border-radius: 999px;
+    color: var(--accent);
+    font-size: 0.7rem;
+    font-weight: 600;
+    vertical-align: middle;
+}
+
+/* Hidden steps shouldn't leave a gap */
+.conditional-step:not(.visible) {
+    margin-bottom: 0;
+}
