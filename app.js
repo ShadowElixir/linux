@@ -10,6 +10,7 @@ const runtimeState = {
     base: null,
     de: null,
     gpu: null,
+    arch: null,
     steam: null,
     channel: null,
     liveData: {
@@ -39,6 +40,8 @@ function initializeUIEventListeners() {
 
             if (matrixStep === "base") {
                 runtimeState.base = elementValue;
+                runtimeState.arch = null;
+                document.querySelectorAll('#step-arch button').forEach(btn => btn.classList.remove("active"));
             }
 
             if (matrixStep === "de") {
@@ -47,6 +50,10 @@ function initializeUIEventListeners() {
 
             if (matrixStep === "gpu") {
                 runtimeState.gpu = elementValue;
+            }
+
+            if (matrixStep === "arch") {
+                runtimeState.arch = elementValue;
             }
 
             if (matrixStep === "steam") {
@@ -113,7 +120,7 @@ async function fetchLatestArtifacts() {
             const internalArtifactId = item.id.toString();
 
             const prefixMatch = fileName.match(
-                /^(shadowos-[a-z-]+?)-f\d+/
+                /^(shadowos-[a-z-]+?(?:-(?:x86_64|arm64))?)-f\d+/
             );
 
             if (prefixMatch) {
@@ -156,12 +163,13 @@ function setVisible(el, show) {
 }
 
 function evaluateShadowPipeline() {
-    const { base, de, gpu, steam, channel } = runtimeState;
+    const { base, de, gpu, arch, steam, channel } = runtimeState;
     const isBazzite = base === "bazzite";
     const isFedora = base === "fedora";
 
     const stepDe = document.getElementById("step-de");
     const stepGpu = document.getElementById("step-gpu");
+    const stepArch = document.getElementById("step-arch");
     const stepSteam = document.getElementById("step-steam");
     const stepChannel = document.getElementById("step-channel");
     const finalDownload = document.getElementById("final-download");
@@ -169,15 +177,15 @@ function evaluateShadowPipeline() {
 
     setVisible(stepDe, isBazzite);
     setVisible(stepGpu, (isBazzite && de !== null) || isFedora);
+    setVisible(stepArch, isFedora && gpu !== null);
     setVisible(stepSteam, isBazzite && de !== null && gpu !== null);
     setVisible(
         stepChannel,
         isBazzite && de !== null && gpu !== null && steam !== null
     );
 
-    // Renumber the steps that apply to the chosen base
     const order = isFedora
-        ? ["step-base", "step-gpu"]
+        ? ["step-base", "step-gpu", "step-arch"]
         : ["step-base", "step-de", "step-gpu", "step-steam", "step-channel"];
 
     order.forEach((id, index) => {
@@ -191,8 +199,8 @@ function evaluateShadowPipeline() {
 
     if (isBazzite && de !== null && gpu !== null && steam !== null && channel !== null) {
         variantTarget = `shadowos-${de}${gpu}${steam}${channel}`;
-    } else if (isFedora && gpu !== null) {
-        variantTarget = `shadowos-lite${gpu}`;
+    } else if (isFedora && gpu !== null && arch !== null) {
+        variantTarget = `shadowos-lite${gpu}-${arch}`;
     }
 
     if (!variantTarget) {
