@@ -120,11 +120,14 @@ async function fetchLatestArtifacts() {
             const internalArtifactId = item.id.toString();
 
             const prefixMatch = fileName.match(
-                /^(shadowos-[a-z-]+?(?:-(?:x86_64|arm64))?)-f\d+/
+                /^(shadowos-[a-z-]+?)-f\d+-(x86_64|arm64)-/
             );
 
             if (prefixMatch) {
-                const variantKey = prefixMatch[1];
+                const [, prefix, fileArch] = prefixMatch;
+                const variantKey = prefix.includes("lite")
+                    ? `${prefix}-${fileArch}`
+                    : prefix;
 
                 runtimeState.liveData.artifacts[variantKey] = {
                     name: fileName,
